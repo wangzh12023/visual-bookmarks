@@ -118,7 +118,22 @@ async function captureOne(context, item) {
   const page = await context.newPage()
   page.setDefaultTimeout(TIMEOUT)
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT })
+    // Normalize deep links that auto-scroll past the hero
+    let gotoUrl = url
+    try {
+      const u = new URL(url)
+      if (u.hostname.includes('overleaf.com') && u.pathname.endsWith('.pdf')) {
+        u.pathname = u.pathname.replace(/\.pdf$/i, '')
+        u.search = ''
+      }
+      u.searchParams.delete('section')
+      u.hash = ''
+      gotoUrl = u.toString()
+    } catch {
+      /* keep */
+    }
+
+    await page.goto(gotoUrl, { waitUntil: 'domcontentloaded', timeout: TIMEOUT })
     // Let late hero media settle a bit
     await page.waitForTimeout(1800)
     try {
@@ -126,6 +141,10 @@ async function captureOne(context, item) {
     } catch {
       /* ignore */
     }
+
+    // Always pin to top — never capture footer/appendix
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.waitForTimeout(400)
 
     // Dribbble: prefer the shot artwork itself
     if (url.includes('dribbble.com/shots/')) {
@@ -136,8 +155,7 @@ async function captureOne(context, item) {
       }
     }
 
-    // For some gallery/marketing pages, a large OG image can be cleaner than chrome+UI.
-    // Prefer viewport screenshot for actual product/demo pages; use OG only when screenshot area is sparse.
+    // Prefer viewport screenshot of the hero / first screen.
     const screenshot = await page.screenshot({ type: 'png', fullPage: false })
     await saveJpeg(screenshot, dest)
 
