@@ -1,6 +1,29 @@
 {
   "name": "visual-bookmarks",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
+  "description": "Browse frontend, UI, and LaTeX template bookmarks by sight — a visual gallery with category filters and preview screenshots.",
+  "author": "Zihan Wang <https://github.com/wangzh12023>",
+  "license": "MIT",
+  "homepage": "https://wangzh12023.github.io/visual-bookmarks/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangzh12023/visual-bookmarks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wangzh12023/visual-bookmarks/issues"
+  },
+  "keywords": [
+    "visual-bookmarks",
+    "design-inspiration",
+    "ui-gallery",
+    "frontend",
+    "latex-templates",
+    "nuxt",
+    "nuxt-ui",
+    "screenshot-gallery",
+    "bookmarks"
+  ],
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --no-fork",

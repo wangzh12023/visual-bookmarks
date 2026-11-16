@@ -2,7 +2,7 @@
   <div class="shadow-sm shadow-gray-200 backdrop-blur-md dark:shadow-gray-600">
     <div class="flex items-center justify-between px-4 py-2 md:px-8">
       <div class="hidden h-12 items-center gap-2 md:flex">
-        <img class="size-8" src="/favicon/newlogo.svg" />
+        <img class="size-8" :src="logoSrc" alt="Visual Bookmarks" />
         <h1 class="text-xl font-bold">Visual Bookmarks</h1>
       </div>
       <div class="md:invisible">
@@ -28,6 +28,15 @@
         <UBadge color="primary" variant="subtle">
           {{ bookmarkMeta.total }} links
         </UBadge>
+        <UTooltip text="GitHub repository">
+          <UButton
+            icon="i-mdi-github"
+            :square="true"
+            variant="ghost"
+            :to="appConfig.repoUrl"
+            target="_blank"
+          />
+        </UTooltip>
         <ThemeSelector />
       </div>
     </div>
@@ -35,7 +44,11 @@
 </template>
 
 <script setup lang="ts">
+import { withBase } from "ufo"
 import { bookmarkMeta } from "@/data/categories"
 
 const isMenuOpen = ref(false)
+const appConfig = useAppConfig()
+const runtimeConfig = useRuntimeConfig()
+const logoSrc = computed(() => withBase("/favicon.svg", runtimeConfig.app.baseURL))
 </script>

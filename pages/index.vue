@@ -32,21 +32,15 @@
 
 <script setup lang="ts">
 const title = ref("Visual Bookmarks")
+const config = useRuntimeConfig()
+const description =
+  "Browse frontend, UI, and LaTeX template bookmarks by sight — preview screenshots with category filters."
 
 useHead({
   title,
-  htmlAttrs: { lang: "zh-CN" },
-  link: [
-    {
-      rel: "icon",
-      type: "image/svg+xml",
-      href: "/favicon/newlogo.svg",
-    },
-  ],
+  htmlAttrs: { lang: "en" },
 })
 
-const description =
-  "Visual walkthrough of Avocation frontend & LaTeX template bookmark collections"
 useSeoMeta({
   title: title.value,
   description,
@@ -54,5 +48,11 @@ useSeoMeta({
   ogDescription: description,
   ogType: "website",
   ogSiteName: title.value,
+  ogUrl: config.public.siteUrl,
+  ogImage: `${config.public.siteUrl}/og.png`,
+  twitterCard: "summary_large_image",
+  twitterTitle: title.value,
+  twitterDescription: description,
+  twitterImage: `${config.public.siteUrl}/og.png`,
 })
 </script>

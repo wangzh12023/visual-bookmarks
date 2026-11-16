@@ -15,7 +15,7 @@
         <div class="relative aspect-[16/10] w-full overflow-hidden bg-gray-100 dark:bg-gray-900">
           <img
             v-if="item.preview"
-            :src="item.preview"
+            :src="previewSrc"
             :alt="item.title"
             class="h-full w-full object-cover object-top"
             loading="lazy"
@@ -93,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import { withBase } from "ufo"
 import type { BookmarkItem } from "@/types/bookmarks.types"
 
 const props = defineProps<{
@@ -100,6 +101,10 @@ const props = defineProps<{
 }>()
 
 const { activePath, previewOnly, query } = useFilterStore()
+const runtimeConfig = useRuntimeConfig()
+const previewSrc = computed(() =>
+  props.item.preview ? withBase(props.item.preview, runtimeConfig.app.baseURL) : "",
+)
 
 const leafLabel = computed(() => props.item.subcategory.at(-1) || props.item.category)
 
