@@ -1,119 +1,47 @@
-let initialButtonFiltering: { [K in ButtonFilterID]: { selected: boolean } } = {
-  FStyled: { selected: false },
-  FUnstyled: { selected: false },
-  FImported: { selected: false },
-  FPasted: { selected: false },
-  FTailwind: { selected: false },
-  FComponents: { selected: false },
-  FCSS: { selected: false },
-  FAccessible: { selected: false },
-  FFigma: { selected: false },
-  FDarkMode: { selected: false },
-  FFree: { selected: false },
-  FOfficial: { selected: false },
-  FRoadmap: { selected: false },
-  FRTLSupport: { selected: false },
-  FTyped: { selected: false },
-  FBuiltinThemes: { selected: false },
-  FThemeGenerator: { selected: false },
-  FSemanticColors: { selected: false },
-  FForm: { selected: false },
-}
-
-let initialRangeFiltering: { [K in RangeFilterID]: { qty: number } } = {
-  FNbStars: { qty: 0 },
-  FNbDownloads: { qty: 0 },
-  FNbComponents: { qty: 0 },
-}
-
-import { type ButtonFilterID, type RangeFilterID } from "@/types/filters.types"
-import { buttonFilters } from "@/data/filters"
-
 export const useFilterStore = () => {
-  const buttonFiltering = useState("buttonFilterStore", () => initialButtonFiltering)
-  const rangeFiltering = useState("rangeFilterStore", () => initialRangeFiltering)
+  const activePath = useState<string | null>("activeCategoryPath", () => null)
+  const previewOnly = useState<boolean>("previewOnly", () => false)
+  const query = useState<string>("searchQuery", () => "")
 
-  // run when a filter button is clicked
-  const invertButtonFiltering = (filterID: ButtonFilterID) => {
-    // 1 - invert the filter selected state
-    const oldSelected = buttonFiltering.value[filterID].selected
-    buttonFiltering.value[filterID].selected = !oldSelected
-
-    // 2 - some filters can auto-disable already selected filters
-    // (eg. selected `Styled` will auto disable `Unstyled`)
-    const autoDisable = <ButtonFilterID>findBy("id", filterID, buttonFilters)!.autoDisable
-    if (oldSelected === false && !!autoDisable) {
-      buttonFiltering.value[autoDisable].selected = false
+  const setActivePath = (path: string | null) => {
+    // toggle off if clicking the same path again
+    if (path !== null && activePath.value === path) {
+      activePath.value = null
+      return
     }
+    activePath.value = path
   }
 
-  // run when a range is changed
-  const changeRangeFiltering = (rangeFilterID: RangeFilterID, qty: number) => {
-    rangeFiltering.value[rangeFilterID].qty = qty
+  const invertPreviewOnly = () => {
+    previewOnly.value = !previewOnly.value
   }
 
-  const touchedButtonFilterIDs = () => <ButtonFilterID[]>Object.entries(
-      buttonFiltering.value
-    )
-      // NOTE: <FilterID[]> allows a more accurate type inference
-      .filter(([_, value]) => value.selected === true)
-      .map(([key, _]) => key)
+  const setQuery = (value: string) => {
+    query.value = value
+  }
 
-  const touchedRangeFilterIDs = () => <RangeFilterID[]>Object.entries(
-      rangeFiltering.value
-    )
-      .filter(([_, value]) => value.qty > 0)
-      .map(([key, _]) => key)
-
-  const nbTouchedFilters = () =>
-    touchedButtonFilterIDs().length + touchedRangeFilterIDs().length
+  const nbTouchedFilters = () => {
+    let n = 0
+    if (activePath.value) n += 1
+    if (previewOnly.value) n += 1
+    if (query.value.trim()) n += 1
+    return n
+  }
 
   const clearFiltering = () => {
-    // NOTE: <ButtonFilterID[]> allows a more accurate type inference
-    for (let filterID of <ButtonFilterID[]>Object.keys(buttonFiltering.value)) {
-      buttonFiltering.value[filterID].selected = false
-    }
-
-    for (let rangeFilterID of <RangeFilterID[]>Object.keys(rangeFiltering.value)) {
-      rangeFiltering.value[rangeFilterID].qty = 0
-    }
+    activePath.value = null
+    previewOnly.value = false
+    query.value = ""
   }
 
   return {
-    buttonFiltering,
-    rangeFiltering,
-    invertButtonFiltering,
-    changeRangeFiltering,
-    touchedButtonFilterIDs,
+    activePath,
+    previewOnly,
+    query,
+    setActivePath,
+    invertPreviewOnly,
+    setQuery,
     nbTouchedFilters,
     clearFiltering,
-  }
-}
-
-// ---------------------------------------------------------------------------------------
-
-import { sections } from "@/data/sections"
-export const useNbComponentsStore = () => {
-  /* Return the number of potential existing components. useful to compute the availability score  */
-  let componentCount = sections.reduce((count, section) => {
-    return count + section.components.length
-  }, 0)
-  return useState("nbComponentsStore", () => componentCount)
-}
-
-// ---------------------------------------------------------------------------------------
-
-export const useShowMissingStore = () => {
-  /* Show all components, even the missing ones, on a library detail */
-  const showMissing = useState("showMissingStore", () => true)
-
-  /* Toggle */
-  const invertMissing = () => {
-    showMissing.value = !showMissing.value
-  }
-
-  return {
-    showMissing,
-    invertMissing,
   }
 }

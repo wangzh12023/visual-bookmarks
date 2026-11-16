@@ -6,58 +6,59 @@
     variant="ghost"
     :multiple="true"
   >
-    <template #mainFeatures>
+    <template #quick>
       <div class="ml-2 flex flex-col gap-1">
-        <div class="grid grid-cols-2 gap-1">
-          <FilterButton buttonFilterID="FStyled" />
-          <FilterButton buttonFilterID="FUnstyled" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-1">
-          <FilterButton buttonFilterID="FImported" />
-          <FilterButton buttonFilterID="FPasted" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-1">
-          <FilterButton buttonFilterID="FComponents" />
-          <FilterButton buttonFilterID="FCSS" />
-        </div>
-
-        <FilterButton buttonFilterID="FTailwind" />
-        <FilterButton buttonFilterID="FFree" />
+        <UTooltip text="Only show bookmarks that already have a preview screenshot">
+          <UButton
+            class="w-full"
+            icon="i-heroicons-photo"
+            :label="`With preview (${bookmarkMeta.withPreview})`"
+            :variant="previewOnly ? 'solid' : 'ghost'"
+            @click="invertPreviewOnly()"
+          />
+        </UTooltip>
+        <UInput
+          v-model="queryModel"
+          icon="i-heroicons-magnifying-glass"
+          size="md"
+          placeholder="Search title / host…"
+          :ui="{ icon: { trailing: { pointer: '' } } }"
+        >
+          <template v-if="queryModel" #trailing>
+            <UButton
+              color="gray"
+              variant="link"
+              icon="i-heroicons-x-mark-20-solid"
+              :padded="false"
+              @click="setQuery('')"
+            />
+          </template>
+        </UInput>
       </div>
     </template>
 
-    <template #moreFeatures>
+    <template #frontend>
       <div class="ml-2 flex flex-col gap-1">
-        <FilterButton buttonFilterID="FAccessible" />
-        <FilterButton buttonFilterID="FBuiltinThemes" />
-        <FilterButton buttonFilterID="FThemeGenerator" />
-        <FilterButton buttonFilterID="FDarkMode" />
-        <FilterButton buttonFilterID="FSemanticColors" />
-        <FilterButton buttonFilterID="FFigma" />
-        <FilterButton buttonFilterID="FOfficial" />
-        <FilterButton buttonFilterID="FRoadmap" />
-        <FilterButton buttonFilterID="FRTLSupport" />
-        <FilterButton buttonFilterID="FTyped" />
-        <FilterButton buttonFilterID="FForm" />
+        <FilterButton
+          v-for="filter in frontendFilters"
+          :key="filter.id"
+          :category-filter="filter"
+        />
       </div>
     </template>
 
-    <template #availableComponents>
-      <div class="ml-2">
-        <FilterRange rangeFilterID="FNbComponents" />
-      </div>
-    </template>
-
-    <template #popularity>
+    <template #latex>
       <div class="ml-2 flex flex-col gap-1">
-        <FilterRange rangeFilterID="FNbStars" />
-        <FilterRange rangeFilterID="FNbDownloads" />
+        <FilterButton
+          v-for="filter in latexFilters"
+          :key="filter.id"
+          :category-filter="filter"
+        />
       </div>
     </template>
   </UAccordion>
-  <div v-if="nbTouchedFilters() > 0" class="flex justify-end">
+
+  <div v-if="nbTouchedFilters() > 0" class="mt-2 flex justify-end">
     <UButton
       color="gray"
       variant="ghost"
@@ -70,30 +71,38 @@
 </template>
 
 <script setup lang="ts">
+import { bookmarkMeta, categoryFilters } from "@/data/categories"
+
 const accordionSections = [
   {
-    label: "Main Features",
+    label: "Quick Filters",
     defaultOpen: true,
-    slot: "mainFeatures",
+    slot: "quick",
   },
   {
-    label: "More Features",
+    label: "Frontend",
     defaultOpen: true,
-    slot: "moreFeatures",
+    slot: "frontend",
   },
   {
-    label: "Available Components",
+    label: "LaTeX Template",
     defaultOpen: true,
-    slot: "availableComponents",
-  },
-  {
-    label: "Popularity",
-    defaultOpen: true,
-    slot: "popularity",
+    slot: "latex",
   },
 ]
 
-const { nbTouchedFilters, clearFiltering } = useFilterStore()
+const frontendFilters = categoryFilters.filter((f) => f.path === "frontend" || f.path.startsWith("frontend/"))
+const latexFilters = categoryFilters.filter(
+  (f) => f.path === "latex template" || f.path.startsWith("latex template/")
+)
+
+const { previewOnly, query, invertPreviewOnly, setQuery, nbTouchedFilters, clearFiltering } =
+  useFilterStore()
+
+const queryModel = computed({
+  get: () => query.value,
+  set: (value: string) => setQuery(value),
+})
 
 const suffix = computed(() => (nbTouchedFilters() == 1 ? "" : "s"))
 </script>

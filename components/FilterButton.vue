@@ -1,24 +1,39 @@
 <template>
   <UTooltip>
     <UButton
-      class="w-full"
-      :icon="buttonFilter.icon"
-      :label="buttonFilter.label"
-      :variant="buttonFiltering[buttonFilter.id].selected ? 'solid' : 'ghost'"
-      @click="invertButtonFiltering(buttonFilter.id)"
+      class="w-full justify-between"
+      :icon="categoryFilter.icon"
+      :label="buttonLabel"
+      :variant="isSelected ? 'solid' : 'ghost'"
+      :class="indentClass"
+      @click="setActivePath(categoryFilter.path)"
     />
     <template #text>
-      {{ buttonFilter.help }}
+      {{ categoryFilter.help }}
     </template>
   </UTooltip>
 </template>
 
 <script setup lang="ts">
-import { buttonFilters } from "@/data/filters"
-import type { ButtonFilterID } from "@/types/filters.types"
+import type { CategoryFilter } from "@/data/categories"
 
-const props = defineProps<{ buttonFilterID: ButtonFilterID }>()
-const buttonFilter = findBy("id", props.buttonFilterID, buttonFilters)!
+const props = defineProps<{
+  categoryFilter: CategoryFilter
+}>()
 
-const { buttonFiltering, invertButtonFiltering } = useFilterStore()
+const { activePath, setActivePath } = useFilterStore()
+
+const depth = computed(() => props.categoryFilter.path.split("/").length - 1)
+
+const indentClass = computed(() => {
+  if (depth.value <= 0) return ""
+  if (depth.value === 1) return "ml-2"
+  return "ml-4"
+})
+
+const isSelected = computed(() => activePath.value === props.categoryFilter.path)
+
+const buttonLabel = computed(
+  () => `${props.categoryFilter.label} (${props.categoryFilter.count})`
+)
 </script>

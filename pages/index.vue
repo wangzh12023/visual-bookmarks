@@ -1,37 +1,25 @@
 <template>
   <div>
     <div class="sticky top-0 z-20">
-      <!-- <VueSchoolBanner /> -->
       <Header />
     </div>
     <UContainer class="pb-6">
       <div class="mt-6 text-center sm:my-12">
         <p class="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Pick the right UI Library
+          Pick references by sight
         </p>
         <p class="text-lg sm:text-xl">
           for your
-          <NuxtLink
-            to="https://vuejs.org/"
-            target="_blank"
-            class="primary-text font-semibold"
-          >
-            Vue 3
-          </NuxtLink>
-          or
-          <NuxtLink
-            to="https://nuxt.com/"
-            target="_blank"
-            class="primary-text font-semibold"
-          >
-            Nuxt 3/4
-          </NuxtLink>
-          Project.
+          <span class="primary-text font-semibold">frontend</span>
+          ,
+          <span class="primary-text font-semibold">LaTeX</span>
+          and
+          <span class="primary-text font-semibold">template</span>
+          work.
         </p>
       </div>
 
       <div class="mt-6 flex flex-grow justify-center gap-4 sm:mt-8">
-        <!-- filters -->
         <div class="-mt-2 hidden w-72 shrink-0 p-3 md:block">
           <Filters />
         </div>
@@ -43,19 +31,11 @@
 </template>
 
 <script setup lang="ts">
-const title = ref("UI Lib Picker")
-
-const runtimeConfig = useRuntimeConfig()
-const loadPlausible = runtimeConfig.public.loadPlausible == "yes"
+const title = ref("Visual Bookmarks")
 
 useHead({
-  // dynamic title
   title,
-
-  // helps for accessibility - remove if using i18n
-  htmlAttrs: { lang: "en" },
-
-  // favicon
+  htmlAttrs: { lang: "zh-CN" },
   link: [
     {
       rel: "icon",
@@ -63,33 +43,16 @@ useHead({
       href: "/favicon/newlogo.svg",
     },
   ],
-
-  // plausible
-  ...(loadPlausible
-    ? {
-        script: [
-          {
-            "src": "https://pl.v1v2.io/js/script.js",
-            "data-domain": "ui-libs.vercel.app",
-            "defer": true,
-          },
-        ],
-      }
-    : {}),
 })
 
-// Meta tags, OG, Twitter
-const description = "🎨 Pick the Right UI Library for your Vue 3 or Nuxt 3/4 Project"
+const description =
+  "Visual walkthrough of Avocation frontend & LaTeX template bookmark collections"
 useSeoMeta({
   title: title.value,
-  description: description,
+  description,
   ogTitle: title.value,
   ogDescription: description,
   ogType: "website",
   ogSiteName: title.value,
-  ogUrl: "https://ui-libs.vercel.app/",
-  ogImage: "https://ui-libs.vercel.app/img/social_small.png",
-  ogImageWidth: "1142",
-  ogImageHeight: "760",
 })
 </script>
